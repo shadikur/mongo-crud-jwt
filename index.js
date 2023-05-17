@@ -35,6 +35,8 @@ const client = new MongoClient(uri, {
     }
 });
 
+const democollection = client.db(process.env.DB_NAME).collection("democollection");
+
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
@@ -42,6 +44,13 @@ async function run() {
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+        app.post("/user", async (req, res) => {
+            const userData = req.body;
+            const result = await democollection.insertOne(userData);
+            res.send(result);
+        })
+
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
@@ -65,12 +74,6 @@ app.get("/test/", (req, res) => {
         res.send({})
     }
 })
-
-app.post("/user", (req, res) => {
-    const userData = req.body;
-    console.log(userData);
-})
-
 
 app.listen(port, () => {
     console.log(`Api server is running on port ${port}`);
