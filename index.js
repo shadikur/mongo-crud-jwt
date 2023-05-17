@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jasonwebtoken');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5003
 
 const demoData = [
@@ -49,6 +50,18 @@ async function run() {
             const userData = req.body;
             const result = await democollection.insertOne(userData);
             res.send(result);
+        })
+
+        app.get("/viewall", async (req, res) => {
+            const query = await democollection.find({}).toArray();
+            res.send(query)
+        })
+
+        app.get("/view/:id", async (req, res) => {
+            const id = req.params.id;
+            const queryData = { _id: new ObjectId(id) }
+            const result = await democollection.findOne(queryData)
+            res.send(result)
         })
 
     } finally {
